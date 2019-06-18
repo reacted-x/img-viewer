@@ -1,0 +1,1 @@
+module.exports = require('@talentui/webpack-config-examples');
