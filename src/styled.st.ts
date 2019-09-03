@@ -243,3 +243,11 @@ export const SCMoveUp = styled(SCVertButton)`
 export const SCMoveDown = styled(SCVertButton)`
   bottom: ${100 - vertiBtnSize - parseInt($Sp5)}px;
 `;
+
+export const SCLoadingText = styled.span`
+  position:absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+`;

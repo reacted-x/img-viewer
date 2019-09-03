@@ -6,9 +6,8 @@ import React, {
   useLayoutEffect,
   useMemo,
 } from 'react';
-import { ChrysanthemumLoading } from '@beisen-phoenix/loading';
 import { IImgboxProps, ERoomStatus, IPosi } from './interface';
-import { SCPreviewBox, SCPreImg } from './styled.st';
+import { SCPreviewBox, SCPreImg,SCLoadingText } from './styled.st';
 import Thumbnail from './thumbnail';
 import useImageStyle from './useImageStyle';
 import { initPosi, fixOffset } from './const';
@@ -117,7 +116,7 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
 
   return (
     <SCPreviewBox style={vpSt}>
-      {!imgLoaded && <ChrysanthemumLoading />}
+      {!imgLoaded &&  <SCLoadingText>加载中...</SCLoadingText>}
       <SCPreImg
         src={previewUrl}
         key={previewUrl} /**为什么要加key，是为了切换图片的时候，把动画关了 */
