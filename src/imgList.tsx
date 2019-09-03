@@ -42,9 +42,9 @@ const ImgList: React.FunctionComponent<IImageListPorps> = ({
   //点击每个小预览图的事件，更新当前图片的索引
   const handleClick = useCallback(
     (idx: number) => (e: React.MouseEvent<HTMLDivElement>) => {
-      onClick(idx);
+      if(idx !== current) onClick(idx);
     },
-    []
+    [current]
   );
 
   const scrollStyle = useMemo(() => {

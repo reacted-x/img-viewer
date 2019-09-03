@@ -4,16 +4,14 @@ import React, {
   useRef,
   useState,
   useLayoutEffect,
-  useMemo
+  useMemo,
 } from 'react';
+import { ChrysanthemumLoading } from '@beisen-phoenix/loading';
 import { IImgboxProps, ERoomStatus, IPosi } from './interface';
 import { SCPreviewBox, SCPreImg } from './styled.st';
 import Thumbnail from './thumbnail';
 import useImageStyle from './useImageStyle';
-import {
-  initPosi,
-  fixOffset
-} from './const';
+import { initPosi, fixOffset } from './const';
 
 const ImgBox: React.FunctionComponent<IImgboxProps> = ({
   previewUrl,
@@ -29,6 +27,10 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
   const isDragging = useRef<boolean>(false);
   const [dragPosiDelta, setDragPosiDelta] = useState<IPosi>(initPosi); //记录鼠标拖拽时的偏移量
 
+  const imgLoaded = useMemo<boolean>(() => {
+    return !!size.height || !!size.width;
+  }, [size.height, size.width]);
+
   const imgStyle = useImageStyle({
     room,
     realSize,
@@ -36,7 +38,7 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
     viewportSize,
     dragPosiDelta,
     isOddRotate,
-    natureSize:size
+    natureSize: size
   });
 
   // 图片加载完成后读取原始更新原始大小
@@ -62,7 +64,7 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
 
   //计算最大的偏移量
   const maxOffet = useMemo<IPosi>(() => {
-    let {height: vpHeight, width: vpWidth} = viewportSize;
+    let { height: vpHeight, width: vpWidth } = viewportSize;
     let { height, width } = realSize;
     return {
       x: Math.floor((width - vpWidth) / 2),
@@ -115,9 +117,10 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
 
   return (
     <SCPreviewBox style={vpSt}>
+      {!imgLoaded && <ChrysanthemumLoading />}
       <SCPreImg
         src={previewUrl}
-        key={previewUrl}  /**为什么要加key，是为了切换图片的时候，把动画关了 */
+        key={previewUrl} /**为什么要加key，是为了切换图片的时候，把动画关了 */
         onLoad={handleImageLoad}
         room={room}
         rotate={rotate}
@@ -135,6 +138,8 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
           originSize={size}
           offset={dragPosiDelta}
           viewportSize={viewportSize}
+          updateOffset={setDragPosiDelta}
+          imgMaxOffset={maxOffet}
         />
       )}
     </SCPreviewBox>

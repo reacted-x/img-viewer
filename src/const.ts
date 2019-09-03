@@ -37,7 +37,7 @@ export const getThumbnailViewportSize = (realSize:ISize, viewportSize:ISize) => 
   return [boxHeight, boxWidth];
 };
 
-export const getThumbnailSize = (nHeight:number, nWidth:number) => {
+export const getThumbnailSize = (nHeight, nWidth) => {
   let delta = nWidth - nHeight;
   let height = thumbnailMaxSize;
   let width = Math.ceil((thumbnailMaxSize * nWidth) / nHeight);

@@ -69,6 +69,8 @@ export interface IThumbnailProps {
   realSize: ISize;
   originSize: ISize;
   viewportSize: ISize;
+  updateOffset: (offset: IPosi) => void;
+  imgMaxOffset: IPosi;
 }
 
 export interface IPosi {

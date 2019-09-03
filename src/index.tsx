@@ -16,7 +16,7 @@ import { getViewPortSize, defaultButtonName } from './const';
 import { Left, Right } from '@beisen-phoenix/icon';
 
 const ImgPreview: React.FunctionComponent<IPreviewProps> = ({
-  files,
+  files = [],
   onClose,
   onDownload,
   defaultSelected = 0,
@@ -24,12 +24,20 @@ const ImgPreview: React.FunctionComponent<IPreviewProps> = ({
   showMask = true,
   buttonName = defaultButtonName,
   showButtonName = true,
-  zIndex=10
+  zIndex = 10
 }) => {
   const [naturalSize, setNaturalSize] = useState<ISize>({
     height: 0,
     width: 0
   });
+
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoaded(true);
+    }, 50);
+  }, []);
+
   const [currentImg, setCurrentImg] = useState<number>(defaultSelected);
   const [room, setRoom] = useState<ERoomStatus>(ERoomStatus.fit);
   const [rotate, setRotate] = useState<number>(0);
@@ -75,14 +83,17 @@ const ImgPreview: React.FunctionComponent<IPreviewProps> = ({
     setCurrentImg(idx);
     setRoom(ERoomStatus.fit);
     setRotate(0);
+    setNaturalSize({ height: 0, width: 0 });
   }, []);
 
   const handleMoveLeft = useCallback(() => {
     setCurrentImg(currentImg - 1);
+    setNaturalSize({ height: 0, width: 0 });
   }, [currentImg]);
 
   const handleMoveRight = useCallback(() => {
     setCurrentImg(currentImg + 1);
+    setNaturalSize({ height: 0, width: 0 });
   }, [currentImg]);
 
   // 点击下载的处理函数
@@ -105,7 +116,7 @@ const ImgPreview: React.FunctionComponent<IPreviewProps> = ({
 
   let node = useMountNode('');
   let el = (
-    <SCMask showMask={showMask} zIndex={zIndex}>
+    <SCMask showMask={showMask} zIndex={zIndex} loaded={loaded}>
       <TitleBar
         {...files[currentImg]}
         onDownload={handleDownload}

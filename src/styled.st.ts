@@ -30,15 +30,22 @@ import {
   imageListItemBorderSize
 } from './const';
 
-export const SCMask = styled.div.attrs({unselectable:'on'})<{showMask: boolean, zIndex:number}>`
-  user-select:none;
+export const SCMask = styled.div.attrs({ unselectable: 'on' })<{
+  showMask: boolean;
+  zIndex: number;
+  loaded: boolean;
+}>`
+  user-select: none;
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index:${props => props.zIndex};
-  background-color:  ${props => props.showMask ? $alpha($M10, '0.5') : 'transparent'};
+  z-index: ${props => props.zIndex};
+  opacity: ${props => (props.loaded ? 1 : 0)};
+  transition: opacity 1s;
+  background-color: ${props =>
+    props.showMask ? $alpha($M10, '0.5') : 'transparent'};
 `;
 
 export const SCTitleBar = styled.div`
@@ -59,11 +66,11 @@ export const SCPreviewBox = styled.div`
   position: relative;
 `;
 
-export const SCPreImg = styled.img<{ room: ERoomStatus; rotate: number}>`
+export const SCPreImg = styled.img<{ room: ERoomStatus; rotate: number }>`
   position: absolute;
   transform: rotate(${props => props.rotate}deg);
   transition: transform 0.2s;
-  cursor: ${props => props.room === ERoomStatus.origin ? 'grab' : 'default'};
+  cursor: ${props => (props.room === ERoomStatus.origin ? 'grab' : 'default')};
   ${$Sh5};
 `;
 
@@ -88,13 +95,13 @@ export const SCActionBox = styled.div`
   vertical-align: top;
   ${$Fs2};
   line-height: 50px;
-  text-align:right;
+  text-align: right;
 `;
 
-export const SCActionItem = styled.div<{disabled?:boolean}>`
+export const SCActionItem = styled.div<{ disabled?: boolean }>`
   display: inline-block;
   cursor: pointer;
-  color: ${ ({disabled=false}) => disabled? $M4  : $M9};
+  color: ${({ disabled = false }) => (disabled ? $M4 : $M9)};
   & + & {margin-left: ${$Sp7};}
   & + &:last-child {
     margin-left: ${$Sp9};
@@ -109,14 +116,14 @@ export const SCActionItem = styled.div<{disabled?:boolean}>`
     width: 18px;
     vertical-align: text-top;
     path + path {
-      fill: ${ ({disabled=false}) => disabled? $M4 : $M9};
+      fill: ${({ disabled = false }) => (disabled ? $M4 : $M9)};
     }
   }
   :hover {
-    color: ${ ({disabled=false}) => disabled? $M4  : $M5};
+    color: ${({ disabled = false }) => (disabled ? $M4 : $M5)};
     svg {
     path + path {
-      fill: ${ ({disabled=false}) => disabled? $M4 : $M5};
+      fill: ${({ disabled = false }) => (disabled ? $M4 : $M5)};
     }
   }
 `;
@@ -125,13 +132,13 @@ export const SCThumbnailBox = styled.div`
   position: absolute;
   right: ${$Sp2};
   bottom: ${$Sp2};
-  border: 2px solid ${$M9}
+  border: 2px solid ${$M9};
 `;
 
-export const SCThumbnailImg = styled.img<{rotate: number }>`
-  position:absolute;
-  left:0;
-  right:0;
+export const SCThumbnailImg = styled.img<{ rotate: number }>`
+  position: absolute;
+  left: 0;
+  right: 0;
   transform: rotate(${props => props.rotate}deg);
   transition: transform 0.2s;
 `;
@@ -139,29 +146,28 @@ export const SCThumbnailImg = styled.img<{rotate: number }>`
 // 右下预览图的那个小方框框
 export const SCThumbnailViewTip = styled.div`
   position: absolute;
-  box-sizing:border-box;
+  box-sizing: border-box;
   border: solid 2px ${$S3};
+  cursor:pointer;
 `;
-
 
 export const SCImageListBoxScroll = styled.div`
   position: absolute;
   right: ${$Sp7};
   width: ${imageListItemSize}px;
   bottom: 100px;
-  overflow:hidden;
+  overflow: hidden;
 `;
 
-export const SCImageListBox = styled.div<{ht: number}>`
+export const SCImageListBox = styled.div<{ ht: number }>`
   position: absolute;
   width: ${imageListItemSize}px;
   height: ${props => props.ht}px;
-  left:0;
+  left: 0;
   transition: top 0.2s;
-
 `;
 
-export const SCImageListItemWrap = styled.div<{selected: boolean}>`
+export const SCImageListItemWrap = styled.div<{ selected: boolean }>`
   height: ${imageListItemSize}px;
   width: ${imageListItemSize}px;
   border-radius: ${$Ra2};
@@ -170,10 +176,10 @@ export const SCImageListItemWrap = styled.div<{selected: boolean}>`
   justify-content: center;
   flex-direction: column;
   box-sizing: border-box;
-  cursor:pointer;
-  border: 2px solid ${props => props.selected ? $S3 : 'transparent'};
+  cursor: pointer;
+  border: 2px solid ${props => (props.selected ? $S3 : 'transparent')};
   & + & {
-    margin-top:${$Sp5};
+    margin-top: ${$Sp5};
   }
 `;
 
@@ -188,45 +194,44 @@ const SCMoveButton = styled.div`
   position: absolute;
   top: 50%;
   cursor: pointer;
-  margin-top: -${40 /2 - titleBarHeight/2}px;
+  margin-top: -${40 / 2 - titleBarHeight / 2}px;
   svg {
     height: 40px;
-    width:40px;
+    width: 40px;
     path + path {
-      fill: ${$M9}
+      fill: ${$M9};
     }
   }
   :hover {
     path + path {
-      fill: ${$M5}
+      fill: ${$M5};
     }
   }
 `;
 
 export const SCMoveLeft = styled(SCMoveButton)`
   left: ${$Sp11};
-`
+`;
 export const SCMoveRight = styled(SCMoveButton)`
   right: ${parseInt($Sp9) + 60 + parseInt($Sp7)}px;
 `;
 
-
 const SCVertButton = styled.div`
   height: 24px;
-  width:24px;
+  width: 24px;
   position: absolute;
   right: ${(imageListItemSize - vertiBtnSize) / 2 + parseInt($Sp7)}px;
   cursor: pointer;
   svg {
     height: 24px;
-    width:24px;
+    width: 24px;
     path + path {
-      fill: ${$M9}
+      fill: ${$M9};
     }
   }
   :hover {
     path + path {
-      fill: ${$M5}
+      fill: ${$M5};
     }
   }
 `;

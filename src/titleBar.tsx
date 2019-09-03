@@ -79,7 +79,9 @@ const TitleBar: React.FunctionComponent<ITitleBarProps> = props => {
 
   return (
     <SCTitleBar>
-      <SCFileName>{fileName}</SCFileName>
+      <Tooltip title={fileName} showOverflowTooltip={true}>
+        <SCFileName>{fileName}</SCFileName>
+      </Tooltip>
       <SCActionBox>
         {rotateEl}
         {roomEl}

@@ -1,6 +1,6 @@
 {
   "name": "@reacted/img-viewer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "图片预览组件",
   "main": "lib/index.js",
   "scripts": {
@@ -57,6 +57,7 @@
   ],
   "dependencies": {
     "@beisen-phoenix/icon": "^1.0.20",
+    "@beisen-phoenix/loading": "^3.0.57",
     "@beisen-phoenix/style-token": "^1.0.38",
     "@beisen-phoenix/tooltip": "^1.0.33"
   }
