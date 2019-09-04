@@ -48,6 +48,9 @@ export interface IImgboxProps extends IFileItem {
   realSize: ISize;
   viewportSize: ISize;
   isOddRotate: boolean;
+  dragDelta: IPosi;
+  onDragDeltaChange: (delta:IPosi) => void;
+  maxOffset: IPosi;
 }
 
 export interface ITitleBarProps extends IFileItem {

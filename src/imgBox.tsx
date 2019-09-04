@@ -2,12 +2,11 @@ import React, {
   useCallback,
   SyntheticEvent,
   useRef,
-  useState,
   useLayoutEffect,
   useMemo,
 } from 'react';
 import { IImgboxProps, ERoomStatus, IPosi } from './interface';
-import { SCPreviewBox, SCPreImg,SCLoadingText } from './styled.st';
+import { SCPreviewBox, SCPreImg, SCLoadingText } from './styled.st';
 import Thumbnail from './thumbnail';
 import useImageStyle from './useImageStyle';
 import { initPosi, fixOffset } from './const';
@@ -20,22 +19,35 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
   rotate,
   realSize,
   viewportSize,
-  isOddRotate
+  isOddRotate,
+  dragDelta,
+  onDragDeltaChange,
+  maxOffset
 }) => {
   const dragMemPosition = useRef<IPosi>(initPosi); //缓存鼠标位置的ref
   const isDragging = useRef<boolean>(false);
-  const [dragPosiDelta, setDragPosiDelta] = useState<IPosi>(initPosi); //记录鼠标拖拽时的偏移量
+  // const [dragPosiDelta, setDragPosiDelta] = useState<IPosi>(initPosi); //记录鼠标拖拽时的偏移量
 
   const imgLoaded = useMemo<boolean>(() => {
     return !!size.height || !!size.width;
   }, [size.height, size.width]);
+
+  // //计算最大的偏移量
+  // const maxOffet = useMemo<IPosi>(() => {
+  //   let { height: vpHeight, width: vpWidth } = viewportSize;
+  //   let { height, width } = realSize;
+  //   return {
+  //     x: Math.floor((width - vpWidth) / 2),
+  //     y: Math.floor((height - vpHeight) / 2)
+  //   };
+  // }, [realSize, viewportSize]);
 
   const imgStyle = useImageStyle({
     room,
     realSize,
     rotate,
     viewportSize,
-    dragPosiDelta,
+    dragPosiDelta: dragDelta,
     isOddRotate,
     natureSize: size
   });
@@ -61,24 +73,14 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
     [room]
   );
 
-  //计算最大的偏移量
-  const maxOffet = useMemo<IPosi>(() => {
-    let { height: vpHeight, width: vpWidth } = viewportSize;
-    let { height, width } = realSize;
-    return {
-      x: Math.floor((width - vpWidth) / 2),
-      y: Math.floor((height - vpHeight) / 2)
-    };
-  }, [realSize, viewportSize]);
-
   //当拖拽进行的时的加调，不停的更新鼠标的位移
   const handleImageDrag = useCallback(
     (e: React.DragEvent<HTMLImageElement>) => {
       e.preventDefault(); //禁止所有默认事件，省得图片跟着鼠标跑
       if (!isDragging.current) return;
       let { x: memX, y: memY } = dragMemPosition.current;
-      let { x: dlX, y: dlY } = dragPosiDelta;
-      let { x: maxX, y: maxY } = maxOffet;
+      let { x: dlX, y: dlY } = dragDelta;
+      let { x: maxX, y: maxY } = maxOffset;
       let { clientX: eX, clientY: eY } = e; //鼠标拖拽结束的点
       dragMemPosition.current = { x: eX, y: eY }; //记住这些鼠标所在的位置
       let x = fixOffset(
@@ -89,9 +91,9 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
         eY - memY + dlY /* 鼠标当前位置 - 鼠标上一次的位置 + 原来的偏移量 */,
         maxY /**最大偏移量 */
       );
-      setDragPosiDelta({ x, y });
+      onDragDeltaChange({ x, y });
     },
-    [dragPosiDelta.x, dragPosiDelta.y, maxOffet]
+    [dragDelta.x, dragDelta.y, maxOffset]
   );
 
   //当拖拽过程中，鼠标离开图片之后，锁定当前位置，不进行位置更新
@@ -104,7 +106,7 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
 
   //当room或者图片发生变化时偏移量归零
   useLayoutEffect(() => {
-    setDragPosiDelta(initPosi);
+    onDragDeltaChange(initPosi);
   }, [room, previewUrl, rotate]);
 
   let vpSt = useMemo(() => {
@@ -135,10 +137,10 @@ const ImgBox: React.FunctionComponent<IImgboxProps> = ({
           bgUrl={previewUrl}
           realSize={realSize}
           originSize={size}
-          offset={dragPosiDelta}
+          offset={dragDelta}
           viewportSize={viewportSize}
-          updateOffset={setDragPosiDelta}
-          imgMaxOffset={maxOffet}
+          updateOffset={onDragDeltaChange}
+          imgMaxOffset={maxOffset}
         />
       )}
     </SCPreviewBox>

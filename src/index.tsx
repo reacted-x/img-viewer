@@ -6,13 +6,18 @@ import React, {
   useRef
 } from 'react';
 import { createPortal } from 'react-dom';
-import { IPreviewProps, ERoomStatus, ISize } from './interface';
+import { IPreviewProps, ERoomStatus, ISize, IPosi } from './interface';
 import useMountNode from './useMountNode';
 import { SCMask, SCMoveLeft, SCMoveRight } from './styled.st';
 import ImgBox from './imgBox';
 import TitleBar from './titleBar';
 import ImgList from './imgList';
-import { getViewPortSize, defaultButtonName } from './const';
+import {
+  getViewPortSize,
+  defaultButtonName,
+  initPosi,
+  fixOffset
+} from './const';
 import { Left, Right } from '@beisen-phoenix/icon';
 
 const ImgPreview: React.FunctionComponent<IPreviewProps> = ({
@@ -30,21 +35,12 @@ const ImgPreview: React.FunctionComponent<IPreviewProps> = ({
     height: 0,
     width: 0
   });
-
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    setTimeout(() => {
-      setLoaded(true);
-    }, 50);
-  }, []);
-
-  const [currentImg, setCurrentImg] = useState<number>(defaultSelected);
-  const [room, setRoom] = useState<ERoomStatus>(ERoomStatus.fit);
   const [rotate, setRotate] = useState<number>(0);
   const [viewportSize, setViewportSize] = useState<ISize>(getViewPortSize());
-  const resizeHandleRef = useRef(() => {
-    setViewportSize(getViewPortSize());
-  });
+  const [dragPosiDelta, setDragPosiDelta] = useState<IPosi>(initPosi); //记录鼠标拖拽时的偏移量
+  const [currentImg, setCurrentImg] = useState<number>(defaultSelected);
+  const [room, setRoom] = useState<ERoomStatus>(ERoomStatus.fit);
+  const [loaded, setLoaded] = useState(false);
 
   const isOddRotate = (rotate / 90) % 2 !== 0;
 
@@ -57,10 +53,38 @@ const ImgPreview: React.FunctionComponent<IPreviewProps> = ({
     return naturalSize;
   }, [isOddRotate, naturalSize]);
 
+  //计算最大的偏移量
+  const maxOffet = useMemo<IPosi>(() => {
+    let { height: vpHeight, width: vpWidth } = viewportSize;
+    let { height, width } = realSize;
+    return {
+      x: Math.floor((width - vpWidth) / 2),
+      y: Math.floor((height - vpHeight) / 2)
+    };
+  }, [realSize, viewportSize]);
+
+  const resizeHandleRef = useRef(() => {
+    setViewportSize(getViewPortSize());
+  });
+
   let flen = files.length;
+
+  useEffect(() => {
+    if (
+      Math.abs(dragPosiDelta.x) > Math.abs(maxOffet.x) ||
+      Math.abs(dragPosiDelta.y) > Math.abs(maxOffet.y)
+    ) {
+      let x = fixOffset(dragPosiDelta.x, maxOffet.x);
+      let y = fixOffset(dragPosiDelta.y, maxOffet.y);
+      setDragPosiDelta({ x, y });
+    }
+  }, [dragPosiDelta, maxOffet, setDragPosiDelta]);
 
   //当window尺寸发生变化时，对应的视窗尺寸也会发生变化，此时需要更新视窗尺寸
   useEffect(() => {
+    setTimeout(() => {
+      setLoaded(true);
+    }, 50);
     window.addEventListener('resize', resizeHandleRef.current);
     return () => {
       window.removeEventListener('resize', resizeHandleRef.current);
@@ -138,6 +162,9 @@ const ImgPreview: React.FunctionComponent<IPreviewProps> = ({
         realSize={realSize}
         viewportSize={viewportSize}
         isOddRotate={isOddRotate}
+        dragDelta={dragPosiDelta}
+        onDragDeltaChange={setDragPosiDelta}
+        maxOffset={maxOffet}
       />
       <ImgList
         files={files}
